@@ -1,0 +1,9 @@
+
+# ignore everything
+*
+
+# exclude .gitignore
+!.gitignore
+
+# exclude python files
+!*.py
