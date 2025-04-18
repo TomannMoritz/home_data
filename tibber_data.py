@@ -2,7 +2,7 @@ import json
 
 import rest_query
 import file
-import date_time
+
 
 CWD = ""
 LOG_FILE = ""
@@ -46,11 +46,11 @@ def get_price_array(extracted_data):
 
 def query_device_information(api_token, price_info_query):
     if api_token is None or not api_token:
-        file.update_file(CWD, LOG_FILE, f"[!] {date_time.get_current_time()} API TOKEN MISSING\n")
+        file.api_token_missing(CWD, LOG_FILE)
         return
 
     if TIBBER_URL is None or not TIBBER_URL:
-        file.update_file(CWD, LOG_FILE, f"[!] {date_time.get_current_time()} API URL MISSING\n")
+        file.api_url_missing(CWD, LOG_FILE)
         return
 
     query_body = json.dumps({"query": price_info_query})

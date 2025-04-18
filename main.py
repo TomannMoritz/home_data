@@ -5,7 +5,6 @@ import miele_data
 import tibber_data
 
 import file
-import date_time
 
 MIELE_API_TOKEN_ = "MIELE_API_TOKEN"
 TIBBER_API_TOKEN_ = "TIBBER_API_TOKEN"
@@ -22,7 +21,7 @@ def query_miele():
     if result is None:
         return False
 
-    file.update_file(CWD, miele_log_file, f"[+] {date_time.get_current_time()} Data received\n")
+    file.data_received(CWD, miele_log_file)
     return True
 
 
@@ -35,7 +34,8 @@ def query_tibber():
 
     if result is None:
         return False
-    file.update_file(CWD, tibber_log_file, f"[+] {date_time.get_current_time()} Data received\n")
+
+    file.data_received(CWD, tibber_log_file)
     return True
 
 
