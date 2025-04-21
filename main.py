@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 import json
+import sys
+import time
 
 import api.miele_data as miele_data
 import api.tibber_data as tibber_data
@@ -8,6 +10,9 @@ import util.file as file
 
 TIBBER_DATA_FILE = "tibber.json"
 MIELE_DATA_FILE = "miele.json"
+
+CURR_WAITING_TIME = 10
+NUM_QUERIES = 1
 
 SAVE_DATA_DIR = ""
 LOG_DIR = ""
@@ -44,8 +49,9 @@ def miele_start_devices():
         print(res)
 
 
-def query_tibber():
+def tibber_get_energy_prices():
     result = tibber_data.query_device_information(tibber_data.get_query_price_info_today())
+    return False
 
     if result is None:
         return False
@@ -55,17 +61,45 @@ def query_tibber():
     return True
 
 
+def exponential_backoff(fn, log_file):
+    global CURR_WAITING_TIME, NUM_QUERIES
+    CURR_WAITING_TIME *= 2
+    NUM_QUERIES += 1
+
+    time.sleep(CURR_WAITING_TIME)
+
+    if NUM_QUERIES > 4:
+        file.msg(LOG_DIR, log_file, "[!]", f" COULD NOT GET DATA - WAITING TIME: {CURR_WAITING_TIME} - QUERIES: {NUM_QUERIES}")
+        return
+
+    success = fn()
+    if not success:
+        exponential_backoff(fn, log_file)
+
+
 def main():
     setup()
 
-    # TODO: requery with exponential backoff
-    miele_data.setup(LOG_DIR, "miele.log", "")
-    miele_successfull = miele_get_device_info()
-    miele_start_devices()
+    if len(sys.argv) <= 2:
+        print("[!] NOT ENOUGH ARGUMENTS")
+        return
 
-    print("-------")
-    tibber_data.setup(LOG_DIR, "tibber.log", "")
-    tibber_successfull = query_tibber()
+    if sys.argv[1] == "miele":
+        miele_data.setup(LOG_DIR, "miele.log", "")
+
+        if sys.argv[2] == "get_device_info":
+            exponential_backoff(miele_get_device_info, miele_data.LOG_FILE)
+
+        if sys.argv[2] == "start_devices":
+            miele_start_devices()
+        return
+
+    if sys.argv[1] == "tibber":
+        tibber_data.setup(LOG_DIR, "tibber.log", "")
+
+        if sys.argv[2] == "get_energy_prices":
+            exponential_backoff(tibber_get_energy_prices, tibber_data.LOG_FILE)
+        return
 
 
 if __name__ == "__main__":
