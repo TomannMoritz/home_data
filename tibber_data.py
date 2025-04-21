@@ -1,4 +1,5 @@
 import json
+import os
 
 import rest_query
 import file
@@ -7,12 +8,16 @@ import file
 CWD = ""
 LOG_FILE = ""
 TIBBER_URL = "https://api.tibber.com/v1-beta/gql"
+TIBBER_API_TOKEN_ = "TIBBER_API_TOKEN"
+API_TOKEN = ""
 
 
 def setup(cwd, log_file, api_url):
-    global CWD, LOG_FILE, TIBBER_URL
+    global CWD, LOG_FILE, TIBBER_URL, API_TOKEN
     CWD = cwd
     LOG_FILE = log_file
+    API_TOKEN = os.getenv(TIBBER_API_TOKEN_)
+
     if api_url is not None and api_url != "":
         TIBBER_URL = api_url
 
@@ -44,8 +49,8 @@ def get_price_array(extracted_data):
     return [price["total"] for price in extracted_data]
 
 
-def query_device_information(api_token, price_info_query):
-    if api_token is None or not api_token:
+def query_device_information(price_info_query):
+    if API_TOKEN is None or not API_TOKEN:
         file.api_token_missing(CWD, LOG_FILE)
         return
 
@@ -59,7 +64,7 @@ def query_device_information(api_token, price_info_query):
     curl_command = ["curl",
                     "-X", "POST",
                     TIBBER_URL,
-                    "-H",  f"Authorization: Bearer {api_token}",
+                    "-H",  f"Authorization: Bearer {API_TOKEN}",
                     "-H", "Content-Type: application/json",
                     "-d", query_body
                     ]
