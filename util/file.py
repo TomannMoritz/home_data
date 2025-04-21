@@ -1,7 +1,7 @@
 import os
 import json
 
-import date_time
+import util.date_time as date_time
 
 
 def update_dir(dir_path):
@@ -12,11 +12,11 @@ def update_dir(dir_path):
 def update_file(dir_path, file_path, data):
     update_dir(dir_path)
     if not os.path.isfile(dir_path + file_path):
-        with open(file_path, "w") as f:
+        with open(dir_path + file_path, "w") as f:
             f.write(data)
             return
 
-    with open(file_path, "a") as f:
+    with open(dir_path + file_path, "a") as f:
         f.write(data)
 
 

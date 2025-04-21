@@ -1,8 +1,8 @@
 import json
 import os
 
-import rest_query
-import file
+import util.rest_query as rest_query
+import util.file as file
 
 
 CWD = ""

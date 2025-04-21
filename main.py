@@ -2,23 +2,24 @@ import os
 from dotenv import load_dotenv
 import json
 
-import miele_data
-import tibber_data
-import file
+import api.miele_data as miele_data
+import api.tibber_data as tibber_data
+import util.file as file
 
 TIBBER_DATA_FILE = "tibber.json"
 MIELE_DATA_FILE = "miele.json"
 
 SAVE_DATA_DIR = ""
-CWD = ""
+LOG_DIR = ""
 
 
 def setup():
     login_name = os.getlogin()
     load_dotenv(f"/home/{login_name}/.config/.env")
 
-    global CWD, SAVE_DATA_DIR
-    CWD = os.path.dirname(os.path.abspath(__file__)) + "/"
+    global LOG_DIR, SAVE_DATA_DIR 
+    cwd = os.path.dirname(os.path.abspath(__file__)) + "/"
+    LOG_DIR = cwd + "log/"
     SAVE_DATA_DIR = os.getenv("SAVE_DATA_DIR")
 
 
@@ -28,7 +29,7 @@ def miele_get_device_info():
     if result is None:
         return False
 
-    file.data_received(CWD, miele_data.LOG_FILE)
+    file.data_received(LOG_DIR, miele_data.LOG_FILE)
     file.overwrite_file(SAVE_DATA_DIR, MIELE_DATA_FILE, json.dumps(result))
 
     return True
@@ -49,7 +50,7 @@ def query_tibber():
     if result is None:
         return False
 
-    file.data_received(CWD, tibber_data.LOG_FILE)
+    file.data_received(LOG_DIR, tibber_data.LOG_FILE)
     file.overwrite_file(SAVE_DATA_DIR, TIBBER_DATA_FILE, json.dumps(result))
     return True
 
@@ -58,12 +59,12 @@ def main():
     setup()
 
     # TODO: requery with exponential backoff
-    miele_data.setup(CWD, "miele.log", "")
+    miele_data.setup(LOG_DIR, "miele.log", "")
     miele_successfull = miele_get_device_info()
     miele_start_devices()
 
     print("-------")
-    tibber_data.setup(CWD, "tibber.log", "")
+    tibber_data.setup(LOG_DIR, "tibber.log", "")
     tibber_successfull = query_tibber()
 
 
