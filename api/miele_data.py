@@ -35,15 +35,15 @@ def query_device_information(language="en"):
     # Request data
     curl_command = ["curl",
                     "-X", "GET",
-                    f"{MIELE_URL}/short/devices?language={language}",
+                    f"{MIELE_URL}/devices?language={language}",
                     "-H",  f"Authorization: Bearer {API_TOKEN}",
                     "-H", "accept: application/json; charset=utf-8"
                     ]
 
     result = rest_query.execute_curl_query(curl_command, CWD, LOG_FILE)
 
-    for entry in result:
-        print(f"Device: {entry['type']} - ID: {entry['fabNumber']}")
+    for id, device_type in zip(get_ids(result), get_device_types(result)):
+        print(f"Device: {device_type} - ID: {id}")
 
     return result
 
@@ -81,3 +81,34 @@ def get_available_actions(device_id):
 
     result = rest_query.execute_curl_query(curl_command, CWD, LOG_FILE)
     return result["processAction"]
+
+
+def get_ids(device_info):
+    return [key for key in device_info.keys()]
+
+
+def get_device_types(device_info):
+    device_types = []
+    for key in device_info.keys():
+        entry = device_info[key]["ident"]
+        device_type = entry["type"]["value_localized"]
+        device_types.append(device_type)
+    return device_types
+
+
+def get_start_times(device_info):
+    device_start_times = []
+    for key in device_info.keys():
+        entry = device_info[key]["state"]
+        device_time = entry["startTime"]
+        device_start_times.append(device_time)
+    return device_start_times
+
+
+def get_status(device_info):
+    device_status = []
+    for key in device_info.keys():
+        entry = device_info[key]["state"]
+        curr_status = entry["status"]["value_raw"]
+        device_status.append(curr_status)
+    return device_status
