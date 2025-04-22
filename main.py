@@ -46,12 +46,15 @@ def miele_start_devices():
     for device in miele_device_data:
         device_id = device["fabNumber"]
         res = miele_data.execute_action(device_id, "START")
-        print(res)
+
+        if res:
+            file.msg(LOG_DIR, miele_data.LOG_FILE, "[*]", f"ID: {device_id} STARTED")
+            continue
+        file.msg(LOG_DIR, miele_data.LOG_FILE, "[~]", f"ID: {device_id} COULD NOT BE STARTED")
 
 
 def tibber_get_energy_prices():
     result = tibber_data.query_device_information(tibber_data.get_query_price_info_today())
-    return False
 
     if result is None:
         return False
@@ -66,14 +69,13 @@ def exponential_backoff(fn, log_file):
     CURR_WAITING_TIME *= 2
     NUM_QUERIES += 1
 
-    time.sleep(CURR_WAITING_TIME)
-
     if NUM_QUERIES > 4:
         file.msg(LOG_DIR, log_file, "[!]", f" COULD NOT GET DATA - WAITING TIME: {CURR_WAITING_TIME} - QUERIES: {NUM_QUERIES}")
         return
 
     success = fn()
     if not success:
+        time.sleep(CURR_WAITING_TIME)
         exponential_backoff(fn, log_file)
 
 

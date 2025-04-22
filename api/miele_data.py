@@ -52,7 +52,7 @@ def execute_action(device_id, action):
     actions = get_available_actions(device_id)
 
     if DEVICE_ACTIONS[action] not in actions:
-        file.msg(CWD, LOG_FILE, "[!]", f"ID: {device_id} ACTION: {action} NOT AVAILABLE")
+        file.msg(CWD, LOG_FILE, "[~]", f"ID: {device_id} ACTION: <{action}> NOT AVAILABLE")
         return False
 
     query_data = json.dumps({"processAction": DEVICE_ACTIONS[action]})
@@ -60,12 +60,13 @@ def execute_action(device_id, action):
                     "-X", "PUT",
                     f"{MIELE_URL}/devices/{device_id}/actions",
                     "-H",  f"Authorization: Bearer {API_TOKEN}",
-                    "-H", "accept: application/json; charset=utf-8",
+                    "-H", "Content-Type: application/json",
                     "-d", query_data
                     ]
 
-    # result = rest_query.execute_curl_query(curl_command, CWD, LOG_FILE)
-    file.msg(CWD, LOG_FILE, "[+]", f"ID: {device_id} ACTION: {action} EXECUTED")
+    result = rest_query.execute_curl_query(curl_command, CWD, LOG_FILE)
+    print(result)
+    file.msg(CWD, LOG_FILE, "[*]", f"ID: {device_id} ACTION: <{action}> EXECUTED")
     return True
 
 

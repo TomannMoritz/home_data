@@ -26,6 +26,9 @@ def execute_curl_query(curl_query, cwd, log_file):
         file.update_file(cwd, log_file, f"[-] {date_time.get_current_time()} {result.returncode}\n")
         return None
 
+    if len(result.stdout) <= 1:
+        return result.stdout
+
     response_data = json.loads(result.stdout)
 
     return response_data
