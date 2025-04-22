@@ -27,6 +27,8 @@ def overwrite_file(dir_path, file_path, data):
 
 
 def get_json_data(dir_path, file_path):
+    if not os.path.isfile(dir_path + file_path):
+        return None
     with open(dir_path + file_path, "r") as f:
         return json.load(f)
 
