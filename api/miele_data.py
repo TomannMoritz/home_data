@@ -112,3 +112,12 @@ def get_status(device_info):
         curr_status = entry["status"]["value_raw"]
         device_status.append(curr_status)
     return device_status
+
+
+def get_program_ids(device_info):
+    program_ids = []
+    for key in device_info.keys():
+        entry = device_info[key]["state"]
+        program_id = entry["ProgramID"]["value_raw"]
+        program_ids.append(program_id)
+    return program_ids
