@@ -45,8 +45,13 @@ def miele_start_device(device_id):
     device_status = status[ids.index(device_id)]
 
     # Device is OFF
-    if device_status == 1:
+    if miele_data.device_is_Off(device_status):
         file.msg(cfg.LOG_DIR, miele_data.LOG_FILE, "[~]", f"ID: {device_id} IS OFF")
+        return
+
+    # Device is RUNNING
+    if miele_data.device_is_Running(device_status):
+        file.msg(cfg.LOG_DIR, miele_data.LOG_FILE, "[~]", f"ID: {device_id} IS RUNNING")
         return
 
     res = miele_data.execute_action(device_id, "START")

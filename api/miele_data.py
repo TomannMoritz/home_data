@@ -17,6 +17,14 @@ DEVICE_ACTIONS = {
         "PAUSE": 3
         }
 
+DEVICE_STATE = {
+        "OFF": 1,
+        "ON": 2,
+        "PROGRAMMED": 3,
+        "PROGRAMMED WAITING TO START": 4,
+        "RUNNING": 5
+        }
+
 
 def setup(cwd, log_file, api_url):
     global CWD, LOG_FILE, MIELE_URL, API_TOKEN
@@ -121,3 +129,12 @@ def get_program_ids(device_info):
         program_id = entry["ProgramID"]["value_raw"]
         program_ids.append(program_id)
     return program_ids
+
+
+def device_is_Off(device_state):
+    return device_state == DEVICE_STATE["OFF"]
+
+
+def device_is_Running(device_state):
+    return device_state == DEVICE_STATE["RUNNING"]
+

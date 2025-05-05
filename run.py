@@ -94,8 +94,12 @@ def main():
     ids = miele.get_ids(miele_device_data)
 
     for i in range(len(status_devices)):
-        if status_devices[i] == 1:
-            file.msg(cfg.LOG_DIR, LOG_FILE, "[~]", f"DEVICE: {ids[i]} NOT READY")
+        if miele.device_is_Off(status_devices[i]):
+            file.msg(cfg.LOG_DIR, LOG_FILE, "[~]", f"DEVICE: {ids[i]} IS OFF")
+            continue
+
+        if miele.device_is_Running(status_devices[i]):
+            file.msg(cfg.LOG_DIR, LOG_FILE, "[~]", f"DEVICE: {ids[i]} IS RUNNING")
             continue
 
         profile_data = file.get_json_data(cfg.SAVE_DATA_DIR, f"{ids[i]}.json")
