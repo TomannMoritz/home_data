@@ -66,7 +66,7 @@ def calculate_price(time_offset, price_array, profile_data):
 
 
 def log_prices(solutions, q_index, min_index):
-    file.msg(cfg.LOG_DIR, LOG_FILE, "\n[~]", " - Calculated Prices")
+    file.msg(cfg.LOG_DIR, LOG_FILE, "[~]", " - Calculated Prices")
     for i, sol in enumerate(solutions):
         hour, minute = date_time.get_quarter_time(q_index + i)
         file.update_file(cfg.LOG_DIR, "run.log", f"  {i:02} - {hour:02}:{minute:02} -> {sol:.4f}\n")
@@ -82,6 +82,7 @@ def get_key_value(data, key):
 
 def main():
     cfg.setup()
+    file.update_file(cfg.LOG_DIR, LOG_FILE, "\n")
 
     tibber_price = file.get_json_data(cfg.SAVE_DATA_DIR, cfg.TIBBER_DATA_FILE)
     price_array = tibber.get_price_array(tibber_price)
@@ -102,16 +103,17 @@ def main():
             file.msg(cfg.LOG_DIR, LOG_FILE, "[~]", f"DEVICE: {ids[i]} IS RUNNING")
             continue
 
+        program_id = program_ids[i]
+        program_data = None
+
         profile_data = file.get_json_data(cfg.SAVE_DATA_DIR, f"{ids[i]}.json")
 
-        if profile_data is None:
-            continue
+        if profile_data is not None:
+            program_data = get_key_value(profile_data, str(program_id))
 
-        program_id = program_ids[i]
-        program_data = get_key_value(profile_data, str(program_id))
         if program_data is None:
             file.msg(cfg.LOG_DIR, LOG_FILE, "[~]", f"DEVICE: {ids[i]} - NO PROFILE: {program_id}")
-            continue
+            program_data = [4000]
 
         quarters_left = date_time.get_index_quarter(start_times[i][0], start_times[i][1])
         price_offset = get_key_value(profile_data, "priceOffset")
