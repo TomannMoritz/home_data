@@ -12,3 +12,5 @@
 !util
 !api
 
+# exclude test directory
+!tests
