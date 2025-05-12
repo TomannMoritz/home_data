@@ -22,7 +22,9 @@ DEVICE_STATE = {
         "ON": 2,
         "PROGRAMMED": 3,
         "PROGRAMMED WAITING TO START": 4,
-        "RUNNING": 5
+        "RUNNING": 5,
+        "PAUSE": 6,
+        "END PROGRAMMED": 7,
         }
 
 
@@ -131,10 +133,36 @@ def get_program_ids(device_info):
     return program_ids
 
 
-def device_is_Off(device_state):
+# --------------------------------------------------
+# Device Status
+
+def skip_device(device_state, device_id):
+    if device_is_off(device_state):
+        return True, ["[~]", f"DEVICE: {device_id} IS OFF"]
+
+    if device_is_running(device_state):
+        return True, ["[~]", f"DEVICE: {device_id} IS RUNNING"]
+
+    if device_finished(device_state):
+        return True, ["[~]", f"DEVICE: {device_id} FINISHED"]
+
+    if not device_is_waiting_to_start(device_state):
+        return True, ["[~]", f"DEVICE: {device_id} SKIPPED - STATUS: {device_state}"]
+    return False, []
+
+
+def device_is_off(device_state):
     return device_state == DEVICE_STATE["OFF"]
 
 
-def device_is_Running(device_state):
+def device_is_running(device_state):
     return device_state == DEVICE_STATE["RUNNING"]
+
+
+def device_is_waiting_to_start(device_state):
+    return device_state == DEVICE_STATE["PROGRAMMED WAITING TO START"]
+
+
+def device_finished(device_state):
+    return device_state == DEVICE_STATE["END PROGRAMMED"]
 

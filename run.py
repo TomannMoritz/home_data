@@ -95,18 +95,19 @@ def main():
     ids = miele.get_ids(miele_device_data)
 
     for i in range(len(status_devices)):
-        if miele.device_is_Off(status_devices[i]):
-            file.msg(cfg.LOG_DIR, LOG_FILE, "[~]", f"DEVICE: {ids[i]} IS OFF")
-            continue
+        device_status = status_devices[i]
+        device_id = ids[i]
 
-        if miele.device_is_Running(status_devices[i]):
-            file.msg(cfg.LOG_DIR, LOG_FILE, "[~]", f"DEVICE: {ids[i]} IS RUNNING")
+        skip, msgs = miele.skip_device(device_status, device_id)
+        if skip:
+            assert len(msgs) == 2, "Invalid logging messages"
+            file.msg(cfg.LOG_DIR, LOG_FILE, msgs[0], msgs[1])
             continue
 
         program_id = program_ids[i]
         program_data = None
 
-        profile_data = file.get_json_data(cfg.SAVE_DATA_DIR, f"{ids[i]}.json")
+        profile_data = file.get_json_data(cfg.SAVE_DATA_DIR, f"{device_id}.json")
 
         if profile_data is not None:
             program_data = get_key_value(profile_data, str(program_id))
