@@ -7,6 +7,13 @@ import util.date_time as date_time
 FILE_EXTENSION = ".json"
 
 
+def is_environment_set(key_value, msg, cwd, log_file="no_file.log"):
+    if key_value is None or not key_value:
+        file.update_file(cwd, log_file, msg)
+        return False
+    return True
+
+
 def set_environment(api_token, api_url, cwd, log_file="no_file.log"):
     if api_token is None or not api_token:
         file.api_token_missing(cwd, log_file)

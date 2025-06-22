@@ -94,7 +94,14 @@ def main():
         return
 
     if sys.argv[1] == "miele":
-        miele_data.setup(cfg.LOG_DIR, "miele.log", "")
+        miele_data.setup(cfg.LOG_DIR, "miele.log", "", "")
+
+        if sys.argv[2] == "refresh_access_token":
+            result = miele_data.refresh_access_token()
+
+            if result is not None:
+                for key, value in result:
+                    cfg.update_entry(key, value)
 
         if sys.argv[2] == "get_device_info":
             exponential_backoff(miele_get_device_info, miele_data.LOG_FILE)
