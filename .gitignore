@@ -5,6 +5,10 @@
 # exclude .gitignore
 !.gitignore
 
+# exclude markdown
+!*.md
+
+
 # exclude python files
 !*.py
 
