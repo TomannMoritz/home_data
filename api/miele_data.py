@@ -79,6 +79,8 @@ def refresh_access_token():
 
     print(f"New access token: {new_access_token}")
     print(f"New refresh token: {new_refresh_token}")
+
+    file.msg(CWD, LOG_FILE, "[~]", "Refresh access token")
     return [(M_ACCESS_TOKEN_, new_access_token), (M_REFRESH_TOKEN_, new_refresh_token)]
 
 
